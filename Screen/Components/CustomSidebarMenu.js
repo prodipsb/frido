@@ -1,7 +1,3 @@
-// Example of Splash, Login and Sign Up in React Native
-// https://aboutreact.com/react-native-login-and-signup/
- 
-// Import React and Component
 import React from 'react';
 import {View, Text, Alert, StyleSheet} from 'react-native';
  
@@ -10,6 +6,7 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
+import Icon from 'react-native-vector-icons/MaterialIcons';
  
 // import AsyncStorage from '@react-native-community/async-storage';
  
@@ -19,11 +16,11 @@ const CustomSidebarMenu = (props) => {
       <View style={stylesSidebar.profileHeader}>
         <View style={stylesSidebar.profileHeaderPicCircle}>
           <Text style={{fontSize: 25, color: '#307ecc'}}>
-            {'About React'.charAt(0)}
+            {'Frido'.charAt(0)}
           </Text>
         </View>
         <Text style={stylesSidebar.profileHeaderText}>
-          AboutReact
+          Frido
         </Text>
       </View>
       <View style={stylesSidebar.profileHeaderLine} />
@@ -31,8 +28,12 @@ const CustomSidebarMenu = (props) => {
       <DrawerContentScrollView {...props}>
         <DrawerItemList {...props} />
         <DrawerItem
+         style={{ color: '#fff' }}
+          icon={({ color, size }) => (
+            <Icon name="logout" color='#ccc' size={size} /> //Set Icon
+          )}
           label={({color}) => 
-            <Text style={{color: '#d8d8d8'}}>
+            <Text style={{color: '#fff'}}>
               Logout
             </Text>
           }
@@ -52,7 +53,7 @@ const CustomSidebarMenu = (props) => {
                   text: 'Confirm',
                   onPress: () => {
                   //  AsyncStorage.clear();
-                    props.navigation.replace('Auth');
+                    props.navigation.replace('LoginScreen');
                   },
                 },
               ],
@@ -71,13 +72,13 @@ const stylesSidebar = StyleSheet.create({
   sideMenuContainer: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#307ecc',
+    backgroundColor: '#009d28',
     paddingTop: 40,
     color: 'white',
   },
   profileHeader: {
     flexDirection: 'row',
-    backgroundColor: '#307ecc',
+    backgroundColor: '#009d28',
     padding: 15,
     textAlign: 'center',
   },
