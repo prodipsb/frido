@@ -1,3 +1,6 @@
+// Example of Splash, Login and Sign Up in React Native
+// https://aboutreact.com/react-native-login-and-signup/
+ 
 // Import React and Component
 import React, {useState, createRef} from 'react';
 import {
@@ -11,39 +14,35 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from 'react-native';
- import Config from 'react-native-config';
+
+// import { FaBeer } from 'react-icons/fa';
+// import { FaCalendarAlt } from "react-icons/fa";
  
 // import AsyncStorage from '@react-native-community/async-storage';
  
-import Loader from './Components/Loader';
+// import Loader from './Components/Loader';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
-
  
-const LoginScreen = ({navigation}) => {
+const ProfileScreen = ({navigation}) => {
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
  
   const passwordInputRef = createRef();
-
  
   const handleSubmitPress = () => {
-    
-    const endPoint = Config.APP_ENDPOINT;
-     console.log('endPoint',Config.APP_ENDPOINT);
-     console.log('port',Config.PORT);
     setErrortext('');
     if (!userEmail) {
-      setErrortext('Email required');
+      alert('Email required*');
       return;
     }
     if (!userPassword) {
-      setErrortext('Password required*');
+      alert('Password required*');
       return;
     }
-    setLoading(true);
+  //  setLoading(true);
     let dataToSend = {email: userEmail, password: userPassword};
     let formBody = [];
     for (let key in dataToSend) {
@@ -54,7 +53,7 @@ const LoginScreen = ({navigation}) => {
     formBody = formBody.join('&');
     console.log('formBody',formBody);
  
-    fetch(`${endPoint}/api/v1/user/signin`, {
+    fetch('http://10.0.2.2:3000/api/v1/user/signin', {
       method: 'POST',
       body:JSON.stringify(dataToSend),
       // headers: {
@@ -73,14 +72,13 @@ const LoginScreen = ({navigation}) => {
         setLoading(false);
         console.log('login ress', responseJson);
         // If server response message same as Data Matched
-        if (responseJson?.error) {
-          setErrortext(responseJson?.error);
-          console.log(responseJson?.error);
-         
-        } else {
+        if (responseJson) {
           // AsyncStorage.setItem('user_id', responseJson.data.email);
          // console.log(responseJson.data.email);
-         navigation.replace('AuthenticatedNavigationRoutes');
+           navigation.replace('DrawerNavigationRoutes');
+        } else {
+          setErrortext(responseJson.msg);
+          console.log('Please check your email id or password');
         }
       })
       .catch((error) => {
@@ -92,7 +90,7 @@ const LoginScreen = ({navigation}) => {
  
   return (
     <View style={styles.mainBody}>
-      <Loader loading={loading} />
+      {/* <Loader loading={loading} /> */}
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -104,7 +102,7 @@ const LoginScreen = ({navigation}) => {
           <KeyboardAvoidingView enabled>
             <View style={{alignItems: 'center'}}>
               <Image
-                source={require('../Image/frido-logo.png')}
+                source={require('../Image/frido.png')}
                 style={{
                   width: '50%',
                   height: 100,
@@ -187,7 +185,7 @@ const LoginScreen = ({navigation}) => {
     </View>
   );
 };
-export default LoginScreen;
+export default ProfileScreen;
  
 const styles = StyleSheet.create({
   mainBody: {
@@ -232,7 +230,6 @@ const styles = StyleSheet.create({
     borderColor: '#dadae8',
   },
   register: {
-    color: '#8b9cb5',
     alignSelf: 'center',
     marginTop: 20,
   },

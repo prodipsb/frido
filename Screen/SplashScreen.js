@@ -36,7 +36,7 @@ const SplashScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../Image/welcome-page.png')}
+        source={require('../Image/welcome-page-bg.png')}
         style={{width: '90%', resizeMode: 'contain', margin: 30}}
       />
      <Text numberOfLines={5}>This is not really a bird nest.</Text>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#009d28',
+    backgroundColor: '#fff',
   },
   activityIndicator: {
     alignItems: 'center',

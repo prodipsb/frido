@@ -20,6 +20,7 @@ import {
   Text,
   useColorScheme,
   View,
+  Image
 } from 'react-native';
 
 import {
@@ -35,35 +36,11 @@ import SplashScreen from './Screen/SplashScreen';
 import RegisterScreen from './Screen/RegisterScreen';
 import DrawerNavigationRoutes from './Screen/DrawerNavigationRoutes';
 import HomeScreen from './Screen/DrawerScreens/HomeScreen';
+import AuthenticatedNavigationRoutes from './Screen/AuthenticatedNavigationRoutes';
+import ProfileScreen from './Screen/DrawerScreens/ProfileScreen';
 
 
 const Stack = createStackNavigator();
-
-// const Section = ({children, title}): Node => {
-//   const isDarkMode = useColorScheme() === 'dark';
-//   return (
-//     <View style={styles.sectionContainer}>
-//       <Text
-//         style={[
-//           styles.sectionTitle,
-//           {
-//             color: isDarkMode ? Colors.white : Colors.black,
-//           },
-//         ]}>
-//         {title}
-//       </Text>
-//       <Text
-//         style={[
-//           styles.sectionDescription,
-//           {
-//             color: isDarkMode ? Colors.light : Colors.dark,
-//           },
-//         ]}>
-//         {children}
-//       </Text>
-//     </View>
-//   );
-// };
 
 const Auth = () => {
   // Stack Navigator for Login and Sign up Screen
@@ -130,19 +107,32 @@ const App: () => Node = () => {
       />
       </Stack.Group>
 
-      {/* Navigation Drawer as a landing page */}
+      {/* Navigation Authenticated Home as a landing page */}
       <Stack.Screen
+          name="AuthenticatedNavigationRoutes"
+          component={AuthenticatedNavigationRoutes}
+          // Hiding header for Navigation Drawer
+          options={{headerShown: false}}
+        />
+
+      {/* <Stack.Screen
           name="DrawerNavigationRoutes"
           component={DrawerNavigationRoutes}
           // Hiding header for Navigation Drawer
           options={{headerShown: false}}
-        />
+        /> */}
 
         <Stack.Screen
           name="HomeScreen"
           component={HomeScreen}
           options={{headerShown: false}}
-        />    
+        />   
+
+        <Stack.Screen
+          name="ProfileScreen"
+          component={ProfileScreen}
+          options={{headerShown: false}}
+        />   
 
     </Stack.Navigator>
     </NavigationContainer>

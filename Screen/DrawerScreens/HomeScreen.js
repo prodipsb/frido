@@ -10,6 +10,12 @@ import {
   Alert, 
   ScrollView 
 } from 'react-native';
+import ProfileScreen from './ProfileScreen';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+
+const Tab = createMaterialBottomTabNavigator();
 
 const HomeOptions = [
   {
@@ -88,6 +94,7 @@ const HomeScreen = () => {
         <View  style={styles.screenLevel}>
           <Text>Home</Text>
         </View>
+
         <FlatList
           contentContainerStyle={styles.listView}
           data={HomeOptions}
@@ -96,6 +103,7 @@ const HomeScreen = () => {
           numColumns={3}
           key={item => item.id}
         />
+
     </SafeAreaView>
   );
 };

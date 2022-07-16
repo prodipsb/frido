@@ -36,14 +36,14 @@ router.post('/api/v1/user/signin',async (req,res)=>{
     const user = await User.findOne({email})
   //  console.log('user',user)
     if(!user){
-        return res.status(422).send({error :"must provide email or password"})
+        return res.status(422).send({error :"User not found"})
     }
     try{
       await user.comparePassword(password);    
       const token = jwt.sign({userId:user._id},jwtkey)
       res.send({token})
     }catch(err){
-        return res.status(422).send({error :"must provide email or password"})
+        return res.status(422).send({error :"Email or Password Invalid"})
     }
     
 

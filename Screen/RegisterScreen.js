@@ -1,6 +1,3 @@
-// Example of Splash, Login and Sign Up in React Native
-// https://aboutreact.com/react-native-login-and-signup/
- 
 // Import React and Component
 import React, {useState, createRef} from 'react';
 import {
@@ -14,10 +11,13 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import Config from 'react-native-config';
  
 import Loader from './Components/Loader';
 import Icon from 'react-native-vector-icons/FontAwesome';
  
+const endPoint = Config.APP_ENDPOINT;
+
 const RegisterScreen = (props) => {
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
@@ -35,15 +35,15 @@ const RegisterScreen = (props) => {
     setErrortext('');
 
     if (!userEmail) {
-      alert('Email required*');
+      setErrortext('Email required*');
       return;
     }
     if (!userPassword) {
-      alert('Password required*');
+      setErrortext('Password required*');
       return;
     }
     //Show Loader
-   // setLoading(true);
+    setLoading(true);
     var dataToSend = {
       email: userEmail,
       password: userPassword,
@@ -61,7 +61,7 @@ const RegisterScreen = (props) => {
     // formBody = formBody.join('&');
     // console.log('formBody',formBody);
  
-    fetch('http://10.0.2.2:3000/api/v1/user/signup', {
+    fetch(`${endPoint}/api/v1/user/signup`, {
       method: 'POST',
       body:JSON.stringify(dataToSend),
       // headers: {
@@ -118,7 +118,7 @@ const RegisterScreen = (props) => {
           style={styles.buttonStyle}
           activeOpacity={0.5}
           onPress={() => props.navigation.navigate('LoginScreen')}>
-          <Text style={styles.buttonTextStyle}>Sign In</Text>
+          <Text style={styles.buttonTextStyle}>SIGN IN</Text>
         </TouchableOpacity>
       </View>
     );
@@ -134,7 +134,7 @@ const RegisterScreen = (props) => {
         }}>
         <View style={{alignItems: 'center'}}>
           <Image
-            source={require('../Image/frido.png')}
+            source={require('../Image/frido-logo.png')}
             style={{
               width: '50%',
               height: 100,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   successTextStyle: {
-   // color: 'white',
+    color: '#8b9cb5',
     textAlign: 'center',
     fontSize: 18,
     padding: 30,
@@ -306,8 +306,10 @@ const styles = StyleSheet.create({
       margin: 5,
   },
   register: {
+    color: '#8b9cb5',
     alignSelf: 'center',
-    marginTop: 20,
+    marginTop: 10,
+    marginBottom: 10,
   },
   registerTextStyle: {
     color: '#009d28',
