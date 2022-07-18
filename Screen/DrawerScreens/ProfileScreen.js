@@ -9,19 +9,20 @@ import {
 } from 'react-native';
  
 // import AsyncStorage from '@react-native-community/async-storage';
+
+// import AsyncStorage from '@react-native-community/async-storage';
  
 // import Loader from './Components/Loader';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
+// import { AsyncStorage } from '@react-native-community/async-storage';
  
 const ProfileScreen = ({navigation}) => {
-  const [userEmail, setUserEmail] = useState('');
-  const [userPassword, setUserPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
- 
-  const passwordInputRef = createRef();
- 
+  
   const handleSubmitPress = () => {
     setErrortext('');
     if (!userEmail) {

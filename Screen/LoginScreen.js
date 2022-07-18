@@ -13,7 +13,7 @@ import {
 } from 'react-native';
  import Config from 'react-native-config';
  
-// import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-community/async-storage';
  
 import Loader from './Components/Loader';
 
@@ -78,7 +78,7 @@ const LoginScreen = ({navigation}) => {
           console.log(responseJson?.error);
          
         } else {
-          // AsyncStorage.setItem('user_id', responseJson.data.email);
+          AsyncStorage.setItem('user', responseJson.data);
          // console.log(responseJson.data.email);
          navigation.replace('AuthenticatedNavigationRoutes');
         }
@@ -104,7 +104,7 @@ const LoginScreen = ({navigation}) => {
           <KeyboardAvoidingView enabled>
             <View style={{alignItems: 'center'}}>
               <Image
-                source={require('../Image/frido-logo.png')}
+                source={require('../Image/frydo-logo.png')}
                 style={{
                   width: '50%',
                   height: 100,

@@ -15,6 +15,7 @@ import Config from 'react-native-config';
  
 import Loader from './Components/Loader';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
  
 const endPoint = Config.APP_ENDPOINT;
 
@@ -95,6 +96,93 @@ const RegisterScreen = (props) => {
         console.error(error);
       });
   };
+
+
+  const signIn = async () => {
+    console.log('enter signIn');
+    try {
+      GoogleSignin.configure(
+        {
+          //webClientId is required if you need offline access
+          offlineAccess: false,
+          androidClientId: '1003551906970-i25crgugmgbtgsamm79qa7vt64pqabdn.apps.googleusercontent.com',
+          scopes: ['profile', 'email']
+        });
+
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      console.log('Google User Info --> ', userInfo);
+     // this.setState({ userInfo });
+      
+     if(userInfo){
+
+       //Show Loader
+      setLoading(true);
+
+      const userData = {
+        name: userInfo.user.name,
+        email: userInfo.user.email,
+        provider: 'google',
+        provider_id: userInfo.user.id,
+        avatar: userInfo.user.photo,
+      }
+
+      console.log('userData', userData);
+   
+     fetch(`${endPoint}/api/v1/user/signup`, {
+      method: 'POST',
+      body:JSON.stringify(userData),
+      // headers: {
+      //   //Header Defination
+      //   'Content-Type':
+      //   'application/x-www-form-urlencoded;charset=UTF-8',
+      // },
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        console.log('responseJson', responseJson);
+        // If server response message same as Data Matched
+        if (responseJson) {
+
+           //Hide Loader
+          setLoading(false);
+
+          setIsRegistraionSuccess(true);
+          console.log(
+            'Registration Successful. Please Login to proceed'
+          );
+        } else {
+          setErrortext(responseJson.msg);
+        }
+      })
+      .catch((error) => {
+        //Hide Loader
+        setLoading(false);
+        console.error(error);
+      });
+
+    }
+
+
+    } catch (error) {
+      console.log('error', error);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+      } else {
+        // some other error happened
+      }
+    }
+  };
+
+
+
   if (isRegistraionSuccess) {
     return (
       <View
@@ -125,6 +213,7 @@ const RegisterScreen = (props) => {
   }
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
+       
       <Loader loading={loading} />
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -134,7 +223,7 @@ const RegisterScreen = (props) => {
         }}>
         <View style={{alignItems: 'center'}}>
           <Image
-            source={require('../Image/frido-logo.png')}
+            source={require('../Image/frydo-logo.png')}
             style={{
               width: '50%',
               height: 100,
@@ -216,8 +305,13 @@ const RegisterScreen = (props) => {
           <Text style={styles.signInAlt}>Or Sign Up With</Text>
 
           <View style={styles.socialLogin}>
-
-              <Icon style={styles.socialIcon} size={24} color="#009d28" name="google" />
+          {/* <GoogleSigninButton
+              style={{ width: 192, height: 48 }}
+              size={GoogleSigninButton.Size.Wide}
+              color={GoogleSigninButton.Color.Dark}
+              onPress={signIn}
+            /> */}
+              <Icon style={styles.socialIcon} size={24} color="#009d28" name="google" onPress={signIn}/>
               <Icon style={styles.socialIcon} size={24} color="#009d28" name="twitter" />
               <Icon style={styles.socialIcon} size={24} color="#009d28" name="instagram" />
 
@@ -235,6 +329,7 @@ const RegisterScreen = (props) => {
 
         </KeyboardAvoidingView>
       </ScrollView>
+      
     </View>
   );
 };

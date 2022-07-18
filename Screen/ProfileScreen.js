@@ -1,6 +1,3 @@
-// Example of Splash, Login and Sign Up in React Native
-// https://aboutreact.com/react-native-login-and-signup/
- 
 // Import React and Component
 import React, {useState, createRef} from 'react';
 import {
@@ -14,9 +11,6 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from 'react-native';
-
-// import { FaBeer } from 'react-icons/fa';
-// import { FaCalendarAlt } from "react-icons/fa";
  
 // import AsyncStorage from '@react-native-community/async-storage';
  
