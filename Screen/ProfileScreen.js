@@ -96,7 +96,7 @@ const ProfileScreen = ({navigation}) => {
           <KeyboardAvoidingView enabled>
             <View style={{alignItems: 'center'}}>
               <Image
-                source={require('../Image/frido.png')}
+                source={require('../assets/images/frydo.png')}
                 style={{
                   width: '50%',
                   height: 100,

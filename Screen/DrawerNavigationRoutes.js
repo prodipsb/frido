@@ -49,7 +49,7 @@ const HomeScreenStack = ({navigation}) => {
       headerTitle: (props) => ( // App Logo
         <Image
           style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
-          source={require('../Image/frido-logo.png')}
+          source={require('../assets/images/frydo-logo.png')}
           resizeMode='contain'
         />
       ),
@@ -125,7 +125,7 @@ const DrawerNavigatorRoutes = (props) => {
         headerTitle: (props) => ( // App Logo
         <Image
           style={{ width: 240, height: 40 }}
-          source={require('../Image/frido-logo.png')}
+          source={require('../assets/images/frydo-logo.png')}
           resizeMode='contain'
         />
       ),

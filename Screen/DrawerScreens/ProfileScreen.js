@@ -1,5 +1,5 @@
 // Import React and Component
-import React, {useState, createRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -7,21 +7,46 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
- 
-// import AsyncStorage from '@react-native-community/async-storage';
-
-// import AsyncStorage from '@react-native-community/async-storage';
- 
+  
 // import Loader from './Components/Loader';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
-// import { AsyncStorage } from '@react-native-community/async-storage';
- 
+ import ScreenTitle from './../Components/ScreenTitle';
+ import {ListItem, Avatar } from "react-native-elements";
+ import { Button, List } from 'react-native-paper';
+
+
+
+
+
 const ProfileScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
+  const [auth, setAuth] = useState('');
+
+   // load the data
+   useEffect(()  => {
+    getData();
+    //const storedValue = await AsyncStorage.getItem("auth");
+   // console.log('storedValue',storedValue);
+   // setAuth({storedValue})
+  }, []);
+
+  const getData = async () => {
+
+    try {
+        const value = await AsyncStorage.getItem('auth')
+        if (value !== null) {
+            setAuth(JSON.parse(value))
+        }
+    } catch (e) {
+        // error reading value
+    }
+}
+
+console.log('auth',auth.user);
   
   const handleSubmitPress = () => {
     setErrortext('');
@@ -36,24 +61,73 @@ const ProfileScreen = ({navigation}) => {
 
   };
 
+  // const list = [
+  //   {
+  //     title: 'Appointments',
+  //     icon: 'av-timer'
+  //   },
+  //   {
+  //     title: 'Trips',
+  //     icon: 'flight-takeoff'
+  //   },
+  // ]
+
   const renderContactHeader = () => {
+    const [expanded, setExpanded] = React.useState(true);
     //const { avatar, name, bio } = this.props
+    const handlePress = () => setExpanded(!expanded);
+
+
+    const logout = () => {
+      console.log('logout');
+      AsyncStorage.removeItem('auth');
+      navigation.replace('LoginScreen');
+    }
+
+
+    const editProfile = () => {
+      navigation.navigate('EditProfile');
+    }
 
     return (
       <View style={styles.headerContainer}>
+        <ScreenTitle title="Profile"/>
         <View style={styles.userRow}>
-          <Image
-            style={styles.userImage}
-            source={{uri: 'https://prodiproy.info/wp-content/uploads/2017/07/Prodip-Roy-Gray.png'}}
-          />
+
+        {/* <Avatar
+          size={100}
+          rounded 
+          icon={{name: 'user', type: 'font-awesome'}}
+          source={{
+            uri:
+            auth?.user?.avatar ? auth?.user?.avatar : null
+          }}
+          >
+          <Avatar.Accessory />
+        </Avatar> */}
+        <Button onPress={editProfile}>Edit</Button>
+        <Avatar
+         size={'large'}
+         rounded 
+         icon={{name: 'user', type: 'font-awesome', color:'green', size: 80, backgroundColor:'white'}}
+          source={{
+            uri:
+            auth?.user?.avatar ? auth?.user?.avatar : '../../assets/images/user.png'
+          }}
+          containerStyle={{ backgroundColor: 'white' }}
+          showEditButton = {true}
+          onPress={() => console.log("Works!")}
+          
+          >
+          <Avatar.Accessory size={23} />
+          {/* <Avatar.Accessory onEditPress={ console.log('click on edit') } /> */}
+        </Avatar>
+
           <View style={styles.userNameRow}>
-            <Text style={styles.userNameText}>{'Prodip'}</Text>
+            <Text style={styles.userNameText}>{auth?.user?.name}</Text>
           </View>
           <View style={styles.userBioRow}>
-            <Text style={styles.userBioText}>{'short bio'}</Text>
-          </View>
-          <View style={styles.userBioRow}>
-            <Text style={styles.userBioText}>{'Email: prodipmsc@gmail.com'}</Text>
+            <Text style={styles.userBioText}>{auth?.user?.email}</Text>
           </View>
         </View>
         <View style={styles.socialRow}>
@@ -85,6 +159,72 @@ const ProfileScreen = ({navigation}) => {
             />
           </View>
         </View>
+
+        {/* <View>
+        {
+          list.map((item, i) => (
+            <ListItem key={i} bottomDivider>
+              <ListItem.Content>
+                <ListItem.Title>{item.title}</ListItem.Title>
+              </ListItem.Content>
+              <ListItem.Chevron />
+            </ListItem>
+          ))
+        }
+      </View> */}
+
+        <List.Section 
+        style={{backgroundColor:'#fff'}}
+        >
+          <List.Accordion
+            title="Calender"
+            style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
+            >
+            <List.Item title="First item" />
+            <List.Item title="Second item" />
+          </List.Accordion>
+
+          <List.Accordion
+            title="Closet"
+            style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
+            >
+            <List.Item title="First1111 item" />
+            <List.Item title="Second item" />
+          </List.Accordion>
+
+          <List.Accordion
+            title="Style Stats"
+            style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
+            >
+            <List.Item title="First item" />
+            <List.Item title="Second item" />
+          </List.Accordion>
+
+          <List.Accordion
+            title="Packing"
+            style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
+            >
+            <List.Item title="First item" />
+            <List.Item title="Second item" />
+          </List.Accordion>
+
+          <List.Accordion
+            title="Settings"
+            style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
+            >
+            <List.Item title="First item" />
+            <List.Item title="Second item" />
+          </List.Accordion>
+
+          <List.Accordion
+            title="Logout"
+            style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
+            >
+            <List.Item  onPress={() => logout()} title="Logout" />
+          </List.Accordion>
+
+        </List.Section>
+
       </View>
     )
   }
@@ -112,7 +252,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFF',
     marginBottom: 10,
-    marginTop: 45,
+    marginTop: 10,
   },
   indicatorTab: {
     backgroundColor: 'transparent',

@@ -36,7 +36,7 @@ const SplashScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../Image/welcome-page-bg.png')}
+        source={require('../assets/images/welcome-page-bg.png')}
         style={{width: '90%', resizeMode: 'contain', margin: 30}}
       />
      <Text numberOfLines={5}>This is not really a bird nest.</Text>

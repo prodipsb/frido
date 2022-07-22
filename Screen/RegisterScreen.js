@@ -192,7 +192,7 @@ const RegisterScreen = (props) => {
           justifyContent: 'center',
         }}>
         <Image
-          source={require('../Image/success.png')}
+          source={require('../assets/images/success.png')}
           style={{
             height: 150,
             resizeMode: 'contain',
@@ -223,7 +223,7 @@ const RegisterScreen = (props) => {
         }}>
         <View style={{alignItems: 'center'}}>
           <Image
-            source={require('../Image/frydo-logo.png')}
+            source={require('../assets/images/frydo-logo.png')}
             style={{
               width: '50%',
               height: 100,
