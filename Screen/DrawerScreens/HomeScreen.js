@@ -13,6 +13,8 @@ import {
 import ProfileScreen from './ProfileScreen';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import ScreenTitle from './../Components/ScreenTitle';
+import { NavigationContainer } from '@react-navigation/native';
 
 
 const Tab = createMaterialBottomTabNavigator();
@@ -21,42 +23,52 @@ const HomeOptions = [
   {
     id: "1",
     text: "Closet",
-    imageLink: require('../../Image/Home/closet.png'),
+    imageLink: require('../../assets/images/home/closet.png'),
   },
   {
     id: "2",
-    text: "Looks",
-    imageLink: require('../../Image/Home/looks.png'),
+    text: "My Looks",
+    imageLink: require('../../assets/images/home/looks.png'),
   },
   {
     id: "3",
     text: "Inspiration",
-    imageLink: require('../../Image/Home/inspiration.png'),
+    imageLink: require('../../assets/images/home/inspiration.png'),
   },
   {
     id: "4",
     text: "Calendar",
-    imageLink: require('../../Image/Home/calender.png'),
+    imageLink: require('../../assets/images/home/calender.png'),
   },
   {
     id: "5",
     text: "Packing",
-    imageLink: require('../../Image/Home/packing.png'),
+    imageLink: require('../../assets/images/home/packing.png'),
   },
   {
     id: "6",
     text: "Style Stats",
-    imageLink: require('../../Image/Home/style-stats.png'),
+    imageLink: require('../../assets/images/home/style-stats.png'),
   },
   {
     id: "7",
     text: "Shop",
-    imageLink: require('../../Image/Home/shop.png'),
+    imageLink: require('../../assets/images/home/shop.png'),
   },
   {
     id: "8",
-    text: "Style Export",
-    imageLink: require('../../Image/Home/style-export.png'),
+    text: "Style Expert",
+    imageLink: require('../../assets/images/home/style-export.png'),
+  },
+  {
+    id: "9",
+    text: "Profile",
+    imageLink: require('../../assets/images/home/profile.png'),
+  },
+  {
+    id: "10",
+    text: "Chat",
+    imageLink: require('../../assets/images/home/chat.png'),
   }
 
 ];
@@ -70,6 +82,7 @@ const showAlert = (item) => {
    ],
    { cancelable: false }
  )
+// this.props.NavigationContainer.navigate('ProfileScreen');
 }
 
 const GridView = ({item}) => (
@@ -80,8 +93,8 @@ const GridView = ({item}) => (
           source={item.imageLink} 
           resizeMode={'contain'}
         />
-        <View style={styles.textStyle}>
-          <Text>{item.text}</Text>
+        <View style={styles.itemTitleSection}>
+          <Text style={styles.itemTitle}>{item?.text}</Text>
         </View>
     </TouchableOpacity>
    
@@ -91,9 +104,7 @@ const GridView = ({item}) => (
 const HomeScreen = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor:'#fff'}}>
-        <View  style={styles.screenLevel}>
-          <Text>Home</Text>
-        </View>
+        <ScreenTitle title="Home"/>
 
         <FlatList
           contentContainerStyle={styles.listView}
@@ -117,21 +128,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignItems: 'center',
     backgroundColor: 'white',
+    color: '#000',
   },
   gridItem: {
     marginBottom: 15,
   },
   listView: {
     justifyContent: 'center',
-    backgroundColor: 'white',
+  //  backgroundColor: 'white',
     alignItems: 'center',
   
   },
 
-  textStyle: {
+  itemTitleSection: {
     flexDirection: 'row', 
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  itemTitle: {
+    color:'#000',
+    fontWeight:'bold',
   },
 
 });

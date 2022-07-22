@@ -38,6 +38,9 @@ import DrawerNavigationRoutes from './Screen/DrawerNavigationRoutes';
 import HomeScreen from './Screen/DrawerScreens/HomeScreen';
 import AuthenticatedNavigationRoutes from './Screen/AuthenticatedNavigationRoutes';
 import ProfileScreen from './Screen/DrawerScreens/ProfileScreen';
+import { HeaderBackButton } from '@react-navigation/elements';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import EditProfile from './Screen/Profile/EditProfile';
 
 
 const Stack = createStackNavigator();
@@ -71,15 +74,34 @@ const Auth = () => {
 
 
 const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
 
   return (
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="SplashScreen">
+    <Stack.Navigator 
+    initialRouteName="SplashScreen"
+    // screenOptions={{
+    //   headerLeft: () => (
+    //     <HeaderBackButton
+    //         labelVisible={false}
+    //         tintColor={'#009d28'}
+    //         onPress={() => navigation.goBack()}
+    //     />
+    //    ),
+    //   headerTitle: (props) => ( // App Logo
+    //     <Image
+    //       style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
+    //       source={require('./assets/images/frydo-logo.png')}
+    //       resizeMode='contain'
+    //     />
+    //   ),
+    //   headerTitleStyle: { flex: 1, textAlign: 'center'},
+    //   headerRight: () => (
+    //     <View style={{ backgroundColor:'#009d28', paddingLeft:5, borderTopLeftRadius:10, borderBottomLeftRadius:10}}>
+    //     <MaterialCommunityIcons style={{paddingRight:15}}  onPress={() => navigation.navigate('HomeScreen')} name="home-outline" color="#fff" size={26} />
+    //     </View>
+    //    ),
+    // }}
+    >
     <Stack.Screen
         name="SplashScreen"
         component={SplashScreen}
@@ -131,8 +153,58 @@ const App: () => Node = () => {
         <Stack.Screen
           name="ProfileScreen"
           component={ProfileScreen}
-          options={{headerShown: false}}
+         // options={{headerShown: true}}
+         options={({navigation})=>({
+            headerLeft: () => (
+              <HeaderBackButton
+                  labelVisible={false}
+                  tintColor={'#009d28'}
+                  onPress={() => navigation.goBack()}
+              />
+             ),
+            headerTitle: (props) => ( // App Logo
+              <Image
+                style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
+                source={require('./assets/images/frydo-logo.png')}
+                resizeMode='contain'
+              />
+            ),
+            headerTitleStyle: { flex: 1, textAlign: 'center'},
+            headerRight: () => (
+              <View style={{ backgroundColor:'#009d28', paddingLeft:5, borderTopLeftRadius:10, borderBottomLeftRadius:10}}>
+              <MaterialCommunityIcons style={{paddingRight:15}}  onPress={() => navigation.navigate('AuthenticatedNavigationRoutes')} name="home-outline" color="#fff" size={26} />
+              </View>
+             ),
+          })}
         />   
+
+      <Stack.Screen
+          name="EditProfile"
+          component={EditProfile}
+         // options={{headerShown: true}}
+         options={({navigation})=>({
+            headerLeft: () => (
+              <HeaderBackButton
+                  labelVisible={false}
+                  tintColor={'#009d28'}
+                  onPress={() => navigation.goBack()}
+              />
+             ),
+            headerTitle: (props) => ( // App Logo
+              <Image
+                style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
+                source={require('./assets/images/frydo-logo.png')}
+                resizeMode='contain'
+              />
+            ),
+            headerTitleStyle: { flex: 1, textAlign: 'center'},
+            headerRight: () => (
+              <View style={{ backgroundColor:'#009d28', paddingLeft:5, borderTopLeftRadius:10, borderBottomLeftRadius:10}}>
+              <MaterialCommunityIcons style={{paddingRight:15}}  onPress={() => navigation.navigate('ProfileScreen')} name="home-outline" color="#fff" size={26} />
+              </View>
+             ),
+          })}
+        />
 
     </Stack.Navigator>
     </NavigationContainer>

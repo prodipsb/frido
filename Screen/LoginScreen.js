@@ -13,12 +13,12 @@ import {
 } from 'react-native';
  import Config from 'react-native-config';
  
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
  
 import Loader from './Components/Loader';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
  
 const LoginScreen = ({navigation}) => {
   const [userEmail, setUserEmail] = useState('');
@@ -52,7 +52,7 @@ const LoginScreen = ({navigation}) => {
       formBody.push(encodedKey + '=' + encodedValue);
     }
     formBody = formBody.join('&');
-    console.log('formBody',formBody);
+    console.log('formBody',`${endPoint}/api/v1/user/signin`);
  
     fetch(`${endPoint}/api/v1/user/signin`, {
       method: 'POST',
@@ -71,15 +71,14 @@ const LoginScreen = ({navigation}) => {
       .then((responseJson) => {
         //Hide Loader
         setLoading(false);
-        console.log('login ress', responseJson);
+        console.log('login auth', JSON.stringify(responseJson));
         // If server response message same as Data Matched
         if (responseJson?.error) {
           setErrortext(responseJson?.error);
           console.log(responseJson?.error);
          
         } else {
-          AsyncStorage.setItem('user', responseJson.data);
-         // console.log(responseJson.data.email);
+          AsyncStorage.setItem('auth', JSON.stringify(responseJson));
          navigation.replace('AuthenticatedNavigationRoutes');
         }
       })
@@ -89,6 +88,46 @@ const LoginScreen = ({navigation}) => {
         console.error(error);
       });
   };
+
+
+  const googleSignIn = async () => {
+    console.log('enter signIn');
+    try {
+      GoogleSignin.configure(
+        {
+          //webClientId is required if you need offline access
+          offlineAccess: false,
+          androidClientId: '1003551906970-i25crgugmgbtgsamm79qa7vt64pqabdn.apps.googleusercontent.com',
+          scopes: ['profile', 'email']
+        });
+
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      console.log('Google User Info --> ', userInfo);
+     // this.setState({ userInfo });
+      
+     if(userInfo){
+
+      navigation.replace('AuthenticatedNavigationRoutes');
+
+    }
+
+
+    } catch (error) {
+      console.log('error', error);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+      } else {
+        // some other error happened
+      }
+    }
+  };
+
+
  
   return (
     <View style={styles.mainBody}>
@@ -104,7 +143,7 @@ const LoginScreen = ({navigation}) => {
           <KeyboardAvoidingView enabled>
             <View style={{alignItems: 'center'}}>
               <Image
-                source={require('../Image/frydo-logo.png')}
+                source={require('../assets/images/frydo-logo.png')}
                 style={{
                   width: '50%',
                   height: 100,
@@ -165,7 +204,7 @@ const LoginScreen = ({navigation}) => {
 
             <View style={styles.socialLogin}>
 
-            <Icon style={styles.socialIcon} size={24} color="#009d28" name="google" />
+            <Icon style={styles.socialIcon} size={24} color="#009d28" name="google"  onPress={googleSignIn}/>
             <Icon style={styles.socialIcon} size={24} color="#009d28" name="twitter" />
             <Icon style={styles.socialIcon} size={24} color="#009d28" name="instagram" />
 

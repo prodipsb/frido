@@ -58,7 +58,7 @@ const HomeScreenStack = ({navigation}) => {
       headerTitle: (props) => ( // App Logo
         <Image
           style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
-          source={require('../Image/frido-logo.png')}
+          source={require('../assets/images/frydo-logo.png')}
           resizeMode='contain'
         />
       ),
@@ -93,7 +93,7 @@ const ProfileScreenStack = ({navigation}) => {
         name="ProfileScreen"
         component={ProfileScreen}
         options={{
-          headerShown: false
+          headerShown: true
         }}
         
       />
@@ -134,7 +134,7 @@ const ClosetScreenStack = ({navigation}) => {
       headerTitle: (props) => ( // App Logo
         <Image
           style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
-          source={require('../Image/frido-logo.png')}
+          source={require('../assets/images/frydo-logo.png')}
           resizeMode='contain'
         />
       ),
@@ -177,7 +177,7 @@ const LooksScreenStack = ({navigation}) => {
       headerTitle: (props) => ( // App Logo
         <Image
           style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
-          source={require('../Image/frido-logo.png')}
+          source={require('../assets/images/frido-logo.png')}
           resizeMode='contain'
         />
       ),
@@ -220,7 +220,7 @@ const InspirationScreenStack = ({navigation}) => {
       headerTitle: (props) => ( // App Logo
         <Image
           style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
-          source={require('../Image/frido-logo.png')}
+          source={require('../assets/images/frydo-logo.png')}
           resizeMode='contain'
         />
       ),
@@ -291,7 +291,7 @@ const AuthenticatedNavigationRoutes = (props) => {
       //   headerTitle: (props) => ( // App Logo
       //     <Image
       //       style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
-      //       source={require('../Image/frido-logo.png')}
+      //       source={require('../assets/images/frido-logo.png')}
       //       resizeMode='contain'
       //     />
       //   ),
@@ -329,7 +329,7 @@ const AuthenticatedNavigationRoutes = (props) => {
             tabBarIcon: ({ color }) => (
               <Image
                 style={{ flex:1, width: 50, height: 40, resizeMode: 'contain' }}
-                source={require('../Image/Icons/closet.png')}
+                source={require('../assets/images/icons/closet.png')}
                 resizeMode='contain'
               />
             ),
@@ -345,7 +345,7 @@ const AuthenticatedNavigationRoutes = (props) => {
             tabBarIcon: ({ color }) => (
               <Image
                 style={{ flex:1, width: 50, height: 40, resizeMode: 'contain' }}
-                source={require('../Image/Icons/looks.png')}
+                source={require('../assets/images/icons/looks.png')}
                 resizeMode='contain'
               />
             ),
@@ -361,7 +361,7 @@ const AuthenticatedNavigationRoutes = (props) => {
             tabBarIcon: ({ color }) => (
               <Image
                 style={{ flex:1, width: 50, height: 40, resizeMode: 'contain' }}
-                source={require('../Image/Icons/inspiration.png')}
+                source={require('../assets/images/icons/inspiration.png')}
                 resizeMode='contain'
               />
             ),
@@ -377,7 +377,7 @@ const AuthenticatedNavigationRoutes = (props) => {
             tabBarIcon: ({ color }) => (
               <Image
                 style={{ flex:1, width: 50, height: 40, resizeMode: 'contain' }}
-                source={require('../Image/Icons/calender.png')}
+                source={require('../assets/images/icons/calender.png')}
                 resizeMode='contain'
               />
             ),
