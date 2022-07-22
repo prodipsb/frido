@@ -61,3 +61,5 @@ buck-out/
 # Ruby / CocoaPods
 /ios/Pods/
 /vendor/bundle/
+android/local.properties
+package-lock.json
