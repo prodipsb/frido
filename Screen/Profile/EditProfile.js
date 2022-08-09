@@ -1,312 +1,443 @@
-import React, { useEffect, useState } from 'react';
+// Import React and Component
+import React, {useState, useEffect, createRef} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
-  SafeAreaView,
-  Image,
+  Text,
+  TextInput,
   ScrollView,
-  Dimensions,
-  StatusBar,
-  Button
+  Keyboard,
+  Image,
+  Button,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  TouchableHighlight,
 } from 'react-native';
-// import { LinearGradient } from '../components/LinearGradient';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const IMAGE_SIZE = SCREEN_WIDTH - 80;
+import Config from 'react-native-config';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+//import  ImagePicker from 'react-native-image-picker';
+import * as ImagePicker from "react-native-image-picker"
+//import {launchImageLibrary} from 'react-native-image-picker';
+import ScreenTitle from './../Components/ScreenTitle';
+import { Avatar } from "react-native-elements";
 
-// type CustomButtonProps = {
-//   selected: boolean;
-//   title: string;
-// };
+import { get, post, upload } from '../Helper/ApiCaller';
 
-const CustomButton = (props) => {
-  const [selected, setSelected] = useState(false);
+import Loader from '../Components/Loader';
 
-  useEffect(() => {
-    if (props) {
-      setSelected(props.selected);
+
+const endPoint = Config.APP_ENDPOINT_LOCAL;
+
+const EditProfile = ({navigation}) => {
+  const [loading, setLoading] = useState(false);
+  const [errortext, setErrortext] = useState('');
+  const [token, setToken] = useState('');
+  const [auth, setAuth] = useState({
+    name: '',
+    email: '',
+    avatar: '',
+    about: '',
+  });
+
+ 
+   useEffect(()  => {
+      getAuth();
+   }, []);
+
+  const getAuth = async () => {   
+
+    try {
+        const authId = await AsyncStorage.getItem('authId')
+       
+        if (authId !== null) {
+
+          const params = {
+            id: authId,
+          };
+     
+
+       const response =  await get(`getuser`, params).then((res) => {
+
+              setAuth(res?.data?.data);
+
+        }).catch(error => {
+          console.log('get auth user from apieeee error',error)
+        });
+
+          
+        //  await fetch(`${endPoint}/getuser?id=${authId}`, {
+        //     method: 'GET',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //     //  'Authorization': `Token ${authParse.token}`
+        //     },
+        //   //  params: params,
+        //  }).then(response => response.json())
+        //  .then(responseJson => {
+        //     console.log('get auth user from apieeee',responseJson);
+        //     setAuth(responseJson?.data);
+        //  }).catch(error => {
+        //     console.log('get auth user from apieeee error',error);
+        //  });
+
+       
+        }
+    } catch (e) {
+      // error reading value
+      console.log('error1',e);
     }
-  }, [props]);
+  }
 
-  const { title } = props;
+// console.log('auth1',auth);
+  
+  const handleSubmitPress = async () => {
+    console.log('handleSubmitPress');
+    setErrortext('');
+    if (!auth?.email) {
+      alert('Email required*');
+      return;
+    }
 
-  return (
-    <Button
-      title={title}
-      titleStyle={{ fontSize: 15, color: 'white', fontFamily: 'regular' }}
-      buttonStyle={
-        selected
-          ? {
-              backgroundColor: 'rgba(213, 100, 140, 1)',
-              borderRadius: 100,
-              width: 127,
-            }
-          : {
-              borderWidth: 1,
-              borderColor: 'white',
-              borderRadius: 30,
-              width: 127,
-              backgroundColor: 'transparent',
-            }
-      }
-      containerStyle={{ marginRight: 10 }}
-      onPress={() => setSelected(!selected)}
-    />
-  );
-};
+    const data={
+      id: auth?._id,
+      name: auth?.name,
+      email: auth?.email,
+      about: auth?.about,
+    }
 
-// type LoginComponentProps = {};
+     console.log('submitted formdata',data);
 
-const EditProfile = () => {
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar barStyle="light-content" />
-      <View style={{ flex: 1, backgroundColor: 'rgba(47,44,60,1)' }}>
-        <View style={styles.statusBar} />
-        <ScrollView style={{ flex: 1 }}>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <Image
+    const response =  await post('updateuser', data).then((res) => {
+
+          console.log('res dipp',res);
+          navigation.replace('ProfileScreen');
+              
+        }).catch(err => console.log(err))
+
+
+    };
+   
+
+  
+
+
+  const renderEditProfile = () => {
+    const [expanded, setExpanded] = React.useState(true);
+    const handlePress = () => setExpanded(!expanded);
+
+
+
+    const handleUploadPhoto = async () => {
+      console.log('handleUploadPhoto');
+
+      ImagePicker.launchImageLibrary(
+        {
+          mediaType: 'photo',
+          includeBase64: false,
+          maxHeight: 200,
+          maxWidth: 200,
+        },
+        async (response) => {
+          const photoAsset = Object.assign({}, ...response?.assets)
+          setAuth({...auth, avatar: photoAsset});
+
+          let formdata = new FormData();
+          formdata.append('id', auth?._id);
+          formdata.append('fileData', {
+            uri : photoAsset?.uri,
+            type: photoAsset?.type,
+            name: photoAsset?.fileName
+           });
+      
+           console.log('submitted formdata',formdata);
+      
+          const getUploaded = await upload('upload', formdata);
+          console.log('getUploaded', getUploaded);
+      
+          //  fetch(`${endPoint}/` + "upload",{
+          //     method: 'post',
+          //     headers: {
+          //       'Accept': 'application/json',
+          //       'Content-Type': 'multipart/form-data',
+          //       },
+          //     body: formdata
+          //     }).then(response => {
+          //         console.log("success ppppp", response)
+          //       //  navigation.replace('ProfileScreen');
+          //     }).catch(err => {
+          //         console.log(err)
+          //     });
+
+
+
+        },
+      )
+
+    }
+
+   // console.log('auth object change',auth);
+    // auth = JSON.parse(auth);
+    // console.log('auth object change uri', auth.uri);
+
+    return (
+      <View>
+        <ScreenTitle title="Edit Profile"/>
+
+        {/* <TouchableHighlight >
+            <Button onPress={() => handleUploadPhoto()} title="Select Photo" />
+        </TouchableHighlight> */}
+
+
+      <View style={styles.mainBody}>
+      <Loader loading={loading} />
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flex: 1,
+          justifyContent: 'center',
+          alignContent: 'center',
+        }}>
+        <View>
+          <KeyboardAvoidingView enabled>
+            <View style={{alignItems: 'center', marginBottom:20}}>
+            <Avatar
+            size={120}
+            rounded 
+            icon={{name: 'user', type: 'font-awesome', color:'green', size: 130, backgroundColor:'white'}}
               source={{
-                uri: 'https://static.pexels.com/photos/428336/pexels-photo-428336.jpeg',
+                uri: 
+                   auth?.avatar?.uri ? auth?.avatar?.uri :  auth?.avatar ? `${endPoint}/${auth?.avatar}` : '../../assets/images/user.png',
               }}
-              style={{
-                width: IMAGE_SIZE,
-                height: IMAGE_SIZE,
-                borderRadius: 10,
-              }}
-            />
-          </View>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              marginTop: 20,
-              marginHorizontal: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 26,
-                color: 'white',
-                fontFamily: 'bold',
-              }}
-            >
-              Theresa
-            </Text>
-            <Text
-              style={{
-                flex: 0.5,
-                fontSize: 15,
-                color: 'gray',
-                textAlign: 'left',
-                marginTop: 5,
-              }}
-            >
-              0.8 mi
-            </Text>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 26,
-                color: 'green',
-                fontFamily: 'bold',
-                textAlign: 'right',
-              }}
-            >
-              84%
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              marginTop: 20,
-              width: SCREEN_WIDTH - 80,
-              marginLeft: 40,
-            }}
-          >
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 15,
-                color: 'white',
-                fontFamily: 'regular',
-              }}
-            >
-              100% Italian, fun loving, affectionate, young lady who knows what
-              it takes to make a relationship work.
-            </Text>
-          </View>
-          <View style={{ flex: 1, marginTop: 30 }}>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 15,
-                color: 'rgba(216, 121, 112, 1)',
-                fontFamily: 'regular',
-                marginLeft: 40,
-              }}
-            >
-              INTERESTS
-            </Text>
-            <View style={{ flex: 1, width: SCREEN_WIDTH, marginTop: 20 }}>
-              <ScrollView
-                style={{ flex: 1 }}
-                horizontal
-                showsHorizontalScrollIndicator={false}
+              containerStyle={{ backgroundColor: 'white' }}
+              showEditButton = {true}
+              onPress={() => console.log("Works!")}
+              
               >
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'column',
-                    height: 170,
-                    marginLeft: 40,
-                    marginRight: 10,
-                  }}
-                >
-                  <View style={{ flex: 1, flexDirection: 'row' }}>
-                    <CustomButton title="Philosophy" selected={true} />
-                    <CustomButton title="Sport" selected={false} />
-                    <CustomButton title="Swimming" selected={true} />
-                    <CustomButton title="Religion" selected={false} />
-                  </View>
-                  <View style={{ flex: 1, flexDirection: 'row' }}>
-                    <CustomButton title="Music" selected={false} />
-                    <CustomButton title="Soccer" selected={true} />
-                    <CustomButton title="Radiohead" selected={true} />
-                    <CustomButton title="Micheal Jackson" selected={false} />
-                  </View>
-                  <View style={{ flex: 1, flexDirection: 'row' }}>
-                    <CustomButton title="Travelling" selected={true} />
-                    <CustomButton title="Rock'n'Roll" selected={false} />
-                    <CustomButton title="Dogs" selected={true} />
-                    <CustomButton title="France" selected={true} />
-                  </View>
-                </View>
-              </ScrollView>
+              <Avatar.Accessory size={35} onPress={() => handleUploadPhoto()}/>
+            </Avatar>
             </View>
-          </View>
-          <View style={{ flex: 1, marginTop: 30 }}>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 15,
-                color: 'rgba(216, 121, 112, 1)',
-                fontFamily: 'regular',
-                marginLeft: 40,
-              }}
-            >
-              INFO
-            </Text>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                marginTop: 20,
-                marginHorizontal: 30,
-              }}
-            >
-              <View style={{ flex: 1, flexDirection: 'row' }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.infoTypeLabel}>Age</Text>
-                  <Text style={styles.infoTypeLabel}>Height</Text>
-                  <Text style={styles.infoTypeLabel}>Ethnicity</Text>
-                  <Text style={styles.infoTypeLabel}>Sign</Text>
-                  <Text style={styles.infoTypeLabel}>Religion</Text>
-                </View>
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                  <Text style={styles.infoAnswerLabel}>26</Text>
-                  <Text style={styles.infoAnswerLabel}>5'4"</Text>
-                  <Text style={styles.infoAnswerLabel}>White</Text>
-                  <Text style={styles.infoAnswerLabel}>Pisces</Text>
-                  <Text style={styles.infoAnswerLabel}>Catholic</Text>
-                </View>
-              </View>
-              <View style={{ flex: 1, flexDirection: 'row' }}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.infoTypeLabel}>Body Type</Text>
-                  <Text style={styles.infoTypeLabel}>Diet</Text>
-                  <Text style={styles.infoTypeLabel}>Smoke</Text>
-                  <Text style={styles.infoTypeLabel}>Drink</Text>
-                  <Text style={styles.infoTypeLabel}>Drugs</Text>
-                </View>
-                <View style={{ flex: 1, marginLeft: 10, marginRight: -20 }}>
-                  <Text style={styles.infoAnswerLabel}>Fit</Text>
-                  <Text style={styles.infoAnswerLabel}>Vegan</Text>
-                  <Text style={styles.infoAnswerLabel}>No</Text>
-                  <Text style={styles.infoAnswerLabel}>No</Text>
-                  <Text style={styles.infoAnswerLabel}>Never</Text>
-                </View>
-              </View>
+            <View style={styles.SectionStyle}>
+              <TextInput
+                style={styles.inputStyle}
+                onChangeText={(UserName) =>
+                 // setUserName(UserName)
+                 setAuth({...auth, name: UserName})
+                }
+                placeholder="Name" 
+                placeholderTextColor="#8b9cb5"
+                autoCapitalize="none"
+                keyboardType="default"
+                returnKeyType="next"
+                onSubmitEditing={() =>
+                  passwordInputRef.current &&
+                  passwordInputRef.current.focus()
+                }
+                underlineColorAndroid="#f000"
+                blurOnSubmit={false}
+                value={auth?.name}
+              />
             </View>
-          </View>
-          <Button
-            containerStyle={{ marginVertical: 20 }}
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            buttonStyle={{
-              height: 55,
-              width: SCREEN_WIDTH - 40,
-              borderRadius: 30,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            linearGradientProps={{
-              colors: ['rgba(214,116,112,1)', 'rgba(233,174,87,1)'],
-              start: [1, 0],
-              end: [0.2, 0],
-            }}
-          //  ViewComponent={LinearGradient}
-            title="Message Theresa"
-            titleStyle={{
-              fontFamily: 'regular',
-              fontSize: 20,
-              color: 'white',
-              textAlign: 'center',
-            }}
-            onPress={() => console.log('Message Theresa')}
-            activeOpacity={0.5}
-          />
-        </ScrollView>
-      </View>
-    </SafeAreaView>
-  );
-};
+            <View style={styles.SectionStyle}>
+              <TextInput
+                style={styles.inputStyle}
+                onChangeText={(UserEmail) =>
+                 // setUserEmail(UserEmail)
+                 setAuth({...auth, email: UserEmail})
+                }
+                placeholder="Email"
+                placeholderTextColor="#8b9cb5"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                returnKeyType="next"
+                onSubmitEditing={() =>
+                  passwordInputRef.current &&
+                  passwordInputRef.current.focus()
+                }
+                underlineColorAndroid="#f000"
+                blurOnSubmit={false}
+                value={auth?.email}
+              />
+            </View>
+            <View style={styles.SectionStyle}>
+            <TextInput
+              style={styles.textArea}
+              underlineColorAndroid="transparent"
+              multiline={true}
+              numberOfLines={4}
+              placeholder="Bio"
+              placeholderTextColor="#8b9cb5"
+              onChangeText={(UserBio) =>
+                //setUserBio(UserBio)
+                setAuth({...auth, about: UserBio})
+              }
+              value={auth?.about}/>
+            </View>
+            {errortext != '' ? (
+              <Text style={styles.errorTextStyle}>
+                {errortext}
+              </Text>
+            ) : null}
+            <TouchableOpacity
+              style={styles.buttonStyle}
+              activeOpacity={0.5}
+              onPress={handleSubmitPress}>
+              <Text style={styles.buttonTextStyle}>SAVE</Text>
+            </TouchableOpacity>
+            
+          </KeyboardAvoidingView>
+        </View>
+      </ScrollView>
+    </View>
 
-const styles = StyleSheet.create({
-  statusBar: {
-    height: 10,
-  },
-  navBar: {
-    height: 60,
-    width: SCREEN_WIDTH,
-    justifyContent: 'center',
-    alignContent: 'center',
-  },
-  nameHeader: {
-    color: 'white',
-    fontSize: 22,
-    textAlign: 'center',
-  },
-  infoTypeLabel: {
-    fontSize: 15,
-    textAlign: 'right',
-    color: 'rgba(126,123,138,1)',
-    fontFamily: 'regular',
-    paddingBottom: 10,
-  },
-  infoAnswerLabel: {
-    fontSize: 15,
-    color: 'white',
-    fontFamily: 'regular',
-    paddingBottom: 10,
-  },
-});
+
+
+      </View>
+    )
+  }
+ 
+  return (
+    <ScrollView style={styles.scroll}>
+    <View style={[styles.container]}>
+      <View style={styles.cardContainer}>
+        {renderEditProfile()}
+      </View>
+    </View>
+  </ScrollView>
+  );
+
+}
 
 export default EditProfile;
+ 
+const styles = StyleSheet.create({
+  mainBody: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    alignContent: 'center',
+  },
+    SectionStyle: {
+    flexDirection: 'row',
+    height: 40,
+    marginTop: 20,
+    marginLeft: 35,
+    marginRight: 35,
+    margin: 10,
+  },
+  buttonStyle: {
+    backgroundColor: '#009d28',
+    borderWidth: 0,
+    color: '#FFFFFF',
+    borderColor: '#009d28',
+    height: 40,
+    alignItems: 'center',
+    borderRadius: 30,
+    marginLeft: 35,
+    marginRight: 35,
+    marginTop: 60,
+    marginBottom: 25,
+  },
+  buttonTextStyle: {
+    color: '#FFFFFF',
+    paddingVertical: 7,
+    fontSize: 16,
+  },
+  inputStyle: {
+    flex: 1,
+    color: '#7DE24E',
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderWidth: 1,
+    borderRadius: 30,
+    borderColor: '#dadae8',
+  },
+  textArea: {
+    flex: 1,
+    color: '#7DE24E',
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderWidth: 1,
+    borderRadius: 30,
+    borderColor: '#dadae8',
+    height: 80,
+    justifyContent: "flex-start"
+  },
+  cardContainer: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+  },
+  headerContainer: {
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  indicatorTab: {
+    backgroundColor: 'transparent',
+  },
+  scroll: {
+    backgroundColor: '#FFF',
+  },
+  sceneContainer: {
+    marginTop: 10,
+  },
+  socialIcon: {
+    marginLeft: 14,
+    marginRight: 14,
+  },
+  socialRow: {
+    flexDirection: 'row',
+  },
+  tabBar: {
+    backgroundColor: '#EEE',
+  },
+  tabContainer: {
+    flex: 1,
+    marginBottom: 12,
+  },
+  tabLabelNumber: {
+    color: 'gray',
+    fontSize: 12.5,
+    textAlign: 'center',
+  },
+  tabLabelText: {
+    color: 'black',
+    fontSize: 22.5,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  userBioRow: {
+    marginLeft: 40,
+    marginRight: 40,
+  },
+  userBioText: {
+    color: 'gray',
+    fontSize: 13.5,
+    textAlign: 'center',
+  },
+  userImage: {
+    borderRadius: 60,
+    height: 120,
+    marginBottom: 10,
+    width: 120,
+  },
+  userNameRow: {
+    marginBottom: 10,
+  },
+  userNameText: {
+    color: '#5B5A5A',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  userRow: {
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+})

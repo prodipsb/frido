@@ -212,12 +212,12 @@ const RegisterScreen = (props) => {
     );
   }
   return (
-    <View style={{flex: 1, backgroundColor: '#fff'}}>
-       
+    <View style={styles.mainBody}>
       <Loader loading={loading} />
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
+          flex: 1,
           justifyContent: 'center',
           alignContent: 'center',
         }}>
@@ -336,6 +336,12 @@ const RegisterScreen = (props) => {
 export default RegisterScreen;
  
 const styles = StyleSheet.create({
+  mainBody: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    alignContent: 'center',
+  },
   SectionStyle: {
     flexDirection: 'row',
     height: 40,
@@ -364,12 +370,12 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     flex: 1,
-    color: '#7DE24E',
+    color: '#8b9cb5',
     paddingLeft: 15,
     paddingRight: 15,
     borderWidth: 1,
     borderRadius: 30,
-    borderColor: '#009d28s',
+    borderColor: '#dadae8',
   },
   errorTextStyle: {
     color: 'red',

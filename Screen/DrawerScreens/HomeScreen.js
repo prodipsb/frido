@@ -73,7 +73,12 @@ const HomeOptions = [
 
 ];
 
-const showAlert = (item) => {
+const showAlert = (item, routeNav) => {
+
+  if(item.text == 'Profile'){
+    routeNav.navigation.replace('ProfileScreen')
+  }else{
+
   Alert.alert(
    'Title',
    `Click on : ${item.text}`,
@@ -81,13 +86,14 @@ const showAlert = (item) => {
      {text: 'OK', onPress: () => console.log('OK Pressed')},
    ],
    { cancelable: false }
- )
-// this.props.NavigationContainer.navigate('ProfileScreen');
+  )
+
+  }
 }
 
-const GridView = ({item}) => (
+const GridView = ({item, routeNav}) => (
   <View style={styles.gridItem}>
-    <TouchableOpacity onPress={() => showAlert(item)}>
+    <TouchableOpacity onPress={() => showAlert(item, routeNav)}>
         <Image 
           style={{height:100,width:100}} 
           source={item.imageLink} 
@@ -101,15 +107,28 @@ const GridView = ({item}) => (
    </View>
 );
  
-const HomeScreen = () => {
+const HomeScreen = (navigation) => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor:'#fff'}}>
         <ScreenTitle title="Home"/>
 
-        <FlatList
+        {/* <FlatList
           contentContainerStyle={styles.listView}
           data={HomeOptions}
           renderItem={({ item }) => <GridView key={item.id} item={item} />}
+          keyExtractor={item => item.id}
+          numColumns={3}
+          key={item => item.id}
+        /> */}
+
+        <FlatList
+          contentContainerStyle={styles.listView}
+          data={HomeOptions}
+          renderItem={({ item }) =>
+          <TouchableOpacity  onPress={(navigation) => navigation.navigate("ProfileScreen")} >
+           <GridView key={item.id} item={item} routeNav={navigation}/>
+           </TouchableOpacity>
+           }
           keyExtractor={item => item.id}
           numColumns={3}
           key={item => item.id}

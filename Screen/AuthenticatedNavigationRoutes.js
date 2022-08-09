@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { 
   View, 
   StyleSheet, 
@@ -7,6 +7,8 @@ import {
   Button,
   TouchableOpacity, 
 } from 'react-native';
+
+import Config from 'react-native-config';
  
 // Import Navigators from React Navigation
 import {createStackNavigator} from '@react-navigation/stack';
@@ -37,13 +39,26 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createMaterialBottomTabNavigator();
+
+const endPoint = Config.APP_ENDPOINT_LOCAL;
  
 const HomeScreenStack = ({navigation}) => {
+
+  const [avatar, setAvatar] = useState(null);
+
+  useEffect(() => {
+
+    AsyncStorage.getItem("avatar").then((path) => {
+     setAvatar(path);
+   });
+
+}, []);
+
   return (
     <Stack.Navigator
     initialRouteName="HomeScreen"
@@ -67,6 +82,10 @@ const HomeScreenStack = ({navigation}) => {
         <Avatar
           rounded
           icon={{name: 'user', color: '#009d28', size:35, type: 'font-awesome'}}
+          source={{
+            uri: 
+                avatar ? `${endPoint}/${avatar}` : '../../assets/images/user.png'
+          }}
           onPress={() => navigation.navigate('ProfileScreen')}
           activeOpacity={0.7}
           overlayContainerStyle={{backgroundColor: '#fff'}}
@@ -266,10 +285,27 @@ const CalenderScreenStack = ({navigation}) => {
 
 
  
-const AuthenticatedNavigationRoutes = (props) => {
+const AuthenticatedNavigationRoutes = () => {
+
+//   const [avatar, setAvatar] = useState(null);
+
+//   useEffect(() => {
+
+//     AsyncStorage.getItem("avatar").then((path) => {
+//      setAvatar(path);
+//    });
+
+// }, []);
+
+      // const id = await AsyncStorage.getItem('authId');
+  // const email = await AsyncStorage.getItem('authEmail');
+  // const avatar = await AsyncStorage.getItem('avatar');
+  // console.log('id', id);
+  // console.log('email', email);
+  // console.log('avatar', avatar);
   return (
     <Tab.Navigator
-        initialRouteName="HomeScreenStack"
+        initialRouteName={'HomeScreenStack'}
         activeColor="#fff"
         barStyle= {{
           borderWidth: 0.5,
@@ -280,6 +316,7 @@ const AuthenticatedNavigationRoutes = (props) => {
           borderColor: 'transparent',
           overflow: 'hidden',
       }}
+      
       // screenOptions = {{
       //   headerLeft: () => (
       //     <HeaderBackButton
@@ -308,9 +345,11 @@ const AuthenticatedNavigationRoutes = (props) => {
       //    ),
       // }}
       >
+        
 
         <Tab.Screen
           name="HomeScreenStack"
+          component={HomeScreenStack}
           options={{
             tabBarLabel: 'Home',
             tabBarIcon: ({ color }) => (
@@ -318,7 +357,6 @@ const AuthenticatedNavigationRoutes = (props) => {
               ),
               headerShown: true,
             }}
-          component={HomeScreenStack}
         />
 
         <Tab.Screen

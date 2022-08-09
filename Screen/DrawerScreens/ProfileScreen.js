@@ -8,17 +8,16 @@ import {
   Image,
 } from 'react-native';
   
-// import Loader from './Components/Loader';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Config from 'react-native-config';
+import { mUser }  from '../../assets/images/user.png';
+import { Button, List } from 'react-native-paper';
+import ScreenTitle from '../Components/ScreenTitle';
+import { Avatar } from "react-native-elements";
+import { get } from '../Helper/ApiCaller';
 
-import Icon from 'react-native-vector-icons/FontAwesome';
- import ScreenTitle from './../Components/ScreenTitle';
- import {ListItem, Avatar } from "react-native-elements";
- import { Button, List } from 'react-native-paper';
 
-
-
+ const endPoint = Config.APP_ENDPOINT_LOCAL;
 
 
 const ProfileScreen = ({navigation}) => {
@@ -26,61 +25,51 @@ const ProfileScreen = ({navigation}) => {
   const [errortext, setErrortext] = useState('');
   const [auth, setAuth] = useState('');
 
-   // load the data
    useEffect(()  => {
-    getData();
-    //const storedValue = await AsyncStorage.getItem("auth");
-   // console.log('storedValue',storedValue);
-   // setAuth({storedValue})
+    getAuth();
+
   }, []);
 
-  const getData = async () => {
+  const getAuth = async () => {   
 
     try {
-        const value = await AsyncStorage.getItem('auth')
-        if (value !== null) {
-            setAuth(JSON.parse(value))
+        const authId = await AsyncStorage.getItem('authId')
+       
+        if (authId !== null) {
+
+          const params = {
+            id: authId,
+          };
+     
+
+       const response =  await get(`getuser`, params).then((res) => {
+
+              setAuth(res?.data?.data);
+
+        }).catch(error => {
+          console.log('get auth user from apieeee error',error)
+        });
+
         }
     } catch (e) {
-        // error reading value
+      console.log('error1',e);
     }
-}
+  }
 
-console.log('auth',auth.user);
-  
-  const handleSubmitPress = () => {
-    setErrortext('');
-    if (!userEmail) {
-      alert('Email required*');
-      return;
-    }
-    if (!userPassword) {
-      alert('Password required*');
-      return;
-    }
 
-  };
 
-  // const list = [
-  //   {
-  //     title: 'Appointments',
-  //     icon: 'av-timer'
-  //   },
-  //   {
-  //     title: 'Trips',
-  //     icon: 'flight-takeoff'
-  //   },
-  // ]
 
   const renderContactHeader = () => {
     const [expanded, setExpanded] = React.useState(true);
-    //const { avatar, name, bio } = this.props
-    const handlePress = () => setExpanded(!expanded);
 
 
     const logout = () => {
       console.log('logout');
-      AsyncStorage.removeItem('auth');
+      AsyncStorage.removeItem('token');
+      AsyncStorage.removeItem('authId');
+      AsyncStorage.removeItem('authName');
+      AsyncStorage.removeItem('authEmail');
+      AsyncStorage.removeItem('avatar');
       navigation.replace('LoginScreen');
     }
 
@@ -94,84 +83,28 @@ console.log('auth',auth.user);
         <ScreenTitle title="Profile"/>
         <View style={styles.userRow}>
 
-        {/* <Avatar
-          size={100}
-          rounded 
-          icon={{name: 'user', type: 'font-awesome'}}
-          source={{
-            uri:
-            auth?.user?.avatar ? auth?.user?.avatar : null
-          }}
-          >
-          <Avatar.Accessory />
-        </Avatar> */}
-        <Button onPress={editProfile}>Edit</Button>
-        <Avatar
-         size={'large'}
-         rounded 
-         icon={{name: 'user', type: 'font-awesome', color:'green', size: 80, backgroundColor:'white'}}
-          source={{
-            uri:
-            auth?.user?.avatar ? auth?.user?.avatar : '../../assets/images/user.png'
-          }}
-          containerStyle={{ backgroundColor: 'white' }}
-          showEditButton = {true}
-          onPress={() => console.log("Works!")}
-          
-          >
-          <Avatar.Accessory size={23} />
-          {/* <Avatar.Accessory onEditPress={ console.log('click on edit') } /> */}
-        </Avatar>
+            <Avatar
+            size={100}
+            rounded 
+            icon={{name: 'user', type: 'font-awesome', color:'green', size: 130, backgroundColor:'white'}}
+              source={{
+                uri: 
+                   auth?.avatar?.uri ? auth?.avatar?.uri :  auth?.avatar ? `${endPoint}/${auth?.avatar}` : mUser
+              }}
+              containerStyle={{ backgroundColor: 'white' }}
+              showEditButton = {true}
+              onPress={() => console.log("Works!")}
+              >
+                <Avatar.Accessory size={25} onPress={() => editProfile()}/>
+            </Avatar>
 
           <View style={styles.userNameRow}>
-            <Text style={styles.userNameText}>{auth?.user?.name}</Text>
+            <Text style={styles.userNameText}>{auth?.name}</Text>
           </View>
           <View style={styles.userBioRow}>
-            <Text style={styles.userBioText}>{auth?.user?.email}</Text>
+            <Text style={styles.userBioText}>{auth?.email}</Text>
           </View>
         </View>
-        <View style={styles.socialRow}>
-          <View>
-            <Icon
-              size={30}
-              type="entypo"
-              color="#3B5A98"
-              name="facebook-square"
-              onPress={() => console.log('facebook')}
-            />
-          </View>
-          <View style={styles.socialIcon}>
-            <Icon
-              size={30}
-              type="entypo"
-              color="#56ACEE"
-              name="twitter-square"
-              onPress={() => console.log('twitter')}
-            />
-          </View>
-          <View>
-            <Icon
-              size={30}
-              type="entypo"
-              color="#DD4C39"
-              name="google-plus-square"
-              onPress={() => console.log('google')}
-            />
-          </View>
-        </View>
-
-        {/* <View>
-        {
-          list.map((item, i) => (
-            <ListItem key={i} bottomDivider>
-              <ListItem.Content>
-                <ListItem.Title>{item.title}</ListItem.Title>
-              </ListItem.Content>
-              <ListItem.Chevron />
-            </ListItem>
-          ))
-        }
-      </View> */}
 
         <List.Section 
         style={{backgroundColor:'#fff'}}
@@ -181,14 +114,12 @@ console.log('auth',auth.user);
             style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
             >
             <List.Item title="First item" />
-            <List.Item title="Second item" />
           </List.Accordion>
 
           <List.Accordion
             title="Closet"
             style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
             >
-            <List.Item title="First1111 item" />
             <List.Item title="Second item" />
           </List.Accordion>
 
@@ -197,7 +128,6 @@ console.log('auth',auth.user);
             style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
             >
             <List.Item title="First item" />
-            <List.Item title="Second item" />
           </List.Accordion>
 
           <List.Accordion
@@ -205,7 +135,6 @@ console.log('auth',auth.user);
             style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
             >
             <List.Item title="First item" />
-            <List.Item title="Second item" />
           </List.Accordion>
 
           <List.Accordion
@@ -213,7 +142,6 @@ console.log('auth',auth.user);
             style={{ width:300,backgroundColor:'#fff', borderBottomColor:'#ccc', borderBottomWidth:1}}
             >
             <List.Item title="First item" />
-            <List.Item title="Second item" />
           </List.Accordion>
 
           <List.Accordion
@@ -304,6 +232,7 @@ const styles = StyleSheet.create({
     width: 120,
   },
   userNameRow: {
+    marginTop:20,
     marginBottom: 10,
   },
   userNameText: {

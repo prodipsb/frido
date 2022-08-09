@@ -19,6 +19,7 @@ import Loader from './Components/Loader';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from '@react-native-google-signin/google-signin';
+import { get, post } from './Helper/ApiCaller';
  
 const LoginScreen = ({navigation}) => {
   const [userEmail, setUserEmail] = useState('');
@@ -29,11 +30,11 @@ const LoginScreen = ({navigation}) => {
   const passwordInputRef = createRef();
 
  
-  const handleSubmitPress = () => {
+  const handleSubmitPress = async () => {
     
-    const endPoint = Config.APP_ENDPOINT;
-     console.log('endPoint',Config.APP_ENDPOINT);
-     console.log('port',Config.PORT);
+  //  const endPoint = Config.APP_ENDPOINT;
+    // console.log('endPoint',Config.APP_ENDPOINT);
+   //  console.log('port',Config.PORT);
     setErrortext('');
     if (!userEmail) {
       setErrortext('Email required');
@@ -44,16 +45,53 @@ const LoginScreen = ({navigation}) => {
       return;
     }
     setLoading(true);
-    let dataToSend = {email: userEmail, password: userPassword};
-    let formBody = [];
-    for (let key in dataToSend) {
-      let encodedKey = encodeURIComponent(key);
-      let encodedValue = encodeURIComponent(dataToSend[key]);
-      formBody.push(encodedKey + '=' + encodedValue);
+     let dataToSend = {email: userEmail, password: userPassword};
+    // let formBody = [];
+    // for (let key in dataToSend) {
+    //   let encodedKey = encodeURIComponent(key);
+    //   let encodedValue = encodeURIComponent(dataToSend[key]);
+    //   formBody.push(encodedKey + '=' + encodedValue);
+    // }
+    // formBody = formBody.join('&');
+  //  console.log('formBody',`${endPoint}/api/v1/user/signin`);
+
+    const payload = {
+        email: userEmail, 
+        password: userPassword
     }
-    formBody = formBody.join('&');
-    console.log('formBody',`${endPoint}/api/v1/user/signin`);
+    console.log("Frydo signin payload", payload)
+
+    // await post('api/v1/user/signin', payload)
+    //         .then((response)=> {
+    //           console.log('response return though axios post method1', response);
+
+    //           //Hide Loader
+    //           setLoading(false);
+
+    //           if (response?.error) {
+
+    //             setErrortext(response?.error);
+    //             console.log(response?.error);
+              
+               
+    //           } else {
+              
+    //             AsyncStorage.setItem('auth', JSON.stringify(response?.data));
+    //             navigation.replace('AuthenticatedNavigationRoutes');
+
+    //           }
+              
+    // })
+    // .catch((err) => {
+    //   console.log('axios return errr', response);
+    //   //Hide Loader
+    //   setLoading(false);
+    //   console.error(err);
+    // });
+
+  //return false;
  
+    const endPoint = Config.APP_ENDPOINT_LOCAL;
     fetch(`${endPoint}/api/v1/user/signin`, {
       method: 'POST',
       body:JSON.stringify(dataToSend),
@@ -71,14 +109,20 @@ const LoginScreen = ({navigation}) => {
       .then((responseJson) => {
         //Hide Loader
         setLoading(false);
-        console.log('login auth', JSON.stringify(responseJson));
+        // console.log('login auth responseJson', responseJson);
+        // console.log('login auth responseJson token', responseJson.token);
+        // console.log('login auth', JSON.stringify(responseJson));
         // If server response message same as Data Matched
         if (responseJson?.error) {
           setErrortext(responseJson?.error);
           console.log(responseJson?.error);
          
         } else {
-          AsyncStorage.setItem('auth', JSON.stringify(responseJson));
+          AsyncStorage.setItem('token', responseJson?.token);
+          AsyncStorage.setItem('authId', responseJson?.user?._id);
+          AsyncStorage.setItem('authName', responseJson?.user?.name);
+          AsyncStorage.setItem('authEmail', responseJson?.user?.email);
+          AsyncStorage.setItem('avatar', responseJson?.user?.avatar);
          navigation.replace('AuthenticatedNavigationRoutes');
         }
       })
@@ -87,6 +131,8 @@ const LoginScreen = ({navigation}) => {
         setLoading(false);
         console.error(error);
       });
+
+      
   };
 
 

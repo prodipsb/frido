@@ -169,7 +169,7 @@ const App: () => Node = () => {
                 resizeMode='contain'
               />
             ),
-            headerTitleStyle: { flex: 1, textAlign: 'center'},
+           // headerTitleStyle: { flex: 1, textAlign: 'center'},
             headerRight: () => (
               <View style={{ backgroundColor:'#009d28', paddingLeft:5, borderTopLeftRadius:10, borderBottomLeftRadius:10}}>
               <MaterialCommunityIcons style={{paddingRight:15}}  onPress={() => navigation.navigate('AuthenticatedNavigationRoutes')} name="home-outline" color="#fff" size={26} />
