@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 // import type {Node} from 'react';
 // Import Navigators from React Navigation
 import {NavigationContainer} from '@react-navigation/native';
@@ -20,7 +20,10 @@ import {
   Text,
   useColorScheme,
   View,
-  Image
+  Image,
+  ToastAndroid,
+  Button,
+  BackHandler
 } from 'react-native';
 
 import {
@@ -30,6 +33,10 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+
+import Config from 'react-native-config';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import LoginScreen from './Screen/LoginScreen';
 import SplashScreen from './Screen/SplashScreen';
@@ -41,71 +48,60 @@ import ProfileScreen from './Screen/DrawerScreens/ProfileScreen';
 import { HeaderBackButton } from '@react-navigation/elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import EditProfile from './Screen/Profile/EditProfile';
-
+import StyleStatsScreen from './Screen/StackScreens/StyleStatScreen';
+import StyleStatScreen from './Screen/StackScreens/StyleStatScreen';
+import ColorStatScreen from './Screen/StackScreens/ColorStatScreen';
+import { Avatar } from 'react-native-elements';
+import StoreCombineItems from './Screen/StackScreens/StoreCombineItems';
 
 const Stack = createStackNavigator();
 
-const Auth = () => {
-  // Stack Navigator for Login and Sign up Screen
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="LoginScreen"
-        component={LoginScreen}
-        options={{headerShown: false}}
-      />
-      {/* <Stack.Screen
-        name="RegisterScreen"
-        component={RegisterScreen}
-        options={{
-          title: 'Register', //Set Header Title
-          headerStyle: {
-            backgroundColor: '#307ecc', //Set Header color
-          },
-          headerTintColor: '#fff', //Set Header text color
-          headerTitleStyle: {
-            fontWeight: 'bold', //Set Header text style
-          },
-        }}
-      /> */}
-    </Stack.Navigator>
-  );
+
+const endPoint = Config.APP_ENDPOINT_LOCAL;
+
+const Toast = ({ visible, message }) => {
+  if (visible) {
+    ToastAndroid.showWithGravityAndOffset(
+      message,
+      ToastAndroid.LONG,
+      ToastAndroid.BOTTOM,
+      25,
+      50
+    );
+    return null;
+  }
+  return null;
 };
 
+const App = () => {
 
-const App: () => Node = () => {
+  const [auth, setAuth] = useState(null);
+  const [visibleToast, setvisibleToast] = useState(false);
+
+  useEffect(() => {
+    getAuth()
+  }, []);
+
+
+  const getAuth = async () => {
+    const auth = await AsyncStorage.getItem('auth');
+    const authJson = JSON.parse(auth);
+    setAuth(authJson);
+  }
+
+  const handleButtonPress = () => {
+    console.log('Button Pressed');
+    setvisibleToast(true);
+  };
 
   return (
     <NavigationContainer>
     <Stack.Navigator 
     initialRouteName="SplashScreen"
-    // screenOptions={{
-    //   headerLeft: () => (
-    //     <HeaderBackButton
-    //         labelVisible={false}
-    //         tintColor={'#009d28'}
-    //         onPress={() => navigation.goBack()}
-    //     />
-    //    ),
-    //   headerTitle: (props) => ( // App Logo
-    //     <Image
-    //       style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
-    //       source={require('./assets/images/frydo-logo.png')}
-    //       resizeMode='contain'
-    //     />
-    //   ),
-    //   headerTitleStyle: { flex: 1, textAlign: 'center'},
-    //   headerRight: () => (
-    //     <View style={{ backgroundColor:'#009d28', paddingLeft:5, borderTopLeftRadius:10, borderBottomLeftRadius:10}}>
-    //     <MaterialCommunityIcons style={{paddingRight:15}}  onPress={() => navigation.navigate('HomeScreen')} name="home-outline" color="#fff" size={26} />
-    //     </View>
-    //    ),
-    // }}
     >
     <Stack.Screen
         name="SplashScreen"
         component={SplashScreen}
-        // Hiding header for Splash Screen
         options={{headerShown: false}}
       />
 
@@ -134,7 +130,36 @@ const App: () => Node = () => {
           name="AuthenticatedNavigationRoutes"
           component={AuthenticatedNavigationRoutes}
           // Hiding header for Navigation Drawer
-          options={{headerShown: false}}
+          options={({navigation})=>({
+            headerLeft: () => (
+              <HeaderBackButton
+                  labelVisible={false}
+                  tintColor={'#009d28'}
+                  onPress={() => navigation.canGoBack() ? navigation.goBack() : BackHandler.exitApp()}
+              />
+             ),
+            headerTitle: (props) => ( // App Logo
+              <Image
+                style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
+                source={require('./assets/images/frydo-logo.png')}
+                resizeMode='contain'
+              />
+            ),
+            headerTitleStyle: { flex: 1, textAlign: 'center'},
+            headerRight: () => (
+              <Avatar
+                rounded
+                icon={{name: 'user', color: '#009d28', size:35, type: 'font-awesome'}}
+                source={{
+                  uri: auth?.avatar?.uri ? auth?.avatar?.uri : auth?.avatar?.includes("https://")? auth?.avatar : `${endPoint}/${auth?.avatar}`,
+                  cache: 'reload'
+                }}
+                onPress={() => navigation.navigate('ProfileScreen')}
+                activeOpacity={0.7}
+                containerStyle={{ borderColor: '#009d28', color:'#009d28', marginRight: 10, borderStyle: 'solid', borderWidth: 1}}
+              />
+             ),
+          })}
         />
 
       {/* <Stack.Screen
@@ -144,11 +169,11 @@ const App: () => Node = () => {
           options={{headerShown: false}}
         /> */}
 
-        <Stack.Screen
+        {/* <Stack.Screen
           name="HomeScreen"
           component={HomeScreen}
           options={{headerShown: false}}
-        />   
+        />    */}
 
         <Stack.Screen
           name="ProfileScreen"
@@ -205,6 +230,87 @@ const App: () => Node = () => {
              ),
           })}
         />
+
+
+    <Stack.Screen
+          name="StoreCombineItems"
+          component={StoreCombineItems}
+         options={({navigation})=>({
+            headerLeft: () => (
+              <HeaderBackButton
+                  labelVisible={false}
+                  tintColor={'#009d28'}
+                  onPress={() => navigation.goBack()}
+              />
+             ),
+            headerTitle: (props) => ( // App Logo
+              <Image
+                style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
+                source={require('./assets/images/frydo-logo.png')}
+                resizeMode='contain'
+              />
+            ),
+            headerTitleStyle: { flex: 1, textAlign: 'center'},
+            headerRight: () => (
+              <View style={{ backgroundColor:'#009d28', paddingLeft:5, borderTopLeftRadius:10, borderBottomLeftRadius:10}}>
+              <MaterialCommunityIcons style={{paddingRight:15}}  onPress={() => navigation.navigate('ProfileScreen')} name="home-outline" color="#fff" size={26} />
+              </View>
+             ),
+          })}
+        />
+
+      {/* <Stack.Screen
+          name="StyleStatScreen"
+          component={StyleStatScreen}
+          options={({navigation})=>({
+            headerLeft: () => (
+              <HeaderBackButton
+                  labelVisible={false}
+                  tintColor={'#009d28'}
+                  onPress={() => navigation.goBack()}
+              />
+             ),
+            headerTitle: (props) => ( // App Logo
+              <Image
+                style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
+                source={require('./assets/images/frydo-logo.png')}
+                resizeMode='contain'
+              />
+            ),
+           // headerTitleStyle: { flex: 1, textAlign: 'center'},
+            headerRight: () => (
+              <View style={{ backgroundColor:'#009d28', paddingLeft:5, borderTopLeftRadius:10, borderBottomLeftRadius:10}}>
+              <MaterialCommunityIcons style={{paddingRight:15}}  onPress={() => navigation.navigate('AuthenticatedNavigationRoutes')} name="home-outline" color="#fff" size={26} />
+              </View>
+             ),
+          })}
+        />    */}
+
+        {/* <Stack.Screen
+          name="ColorStatScreen"
+          component={ColorStatScreen}
+          options={({navigation})=>({
+            headerLeft: () => (
+              <HeaderBackButton
+                  labelVisible={false}
+                  tintColor={'#009d28'}
+                  onPress={() => navigation.goBack()}
+              />
+             ),
+            headerTitle: (props) => ( // App Logo
+              <Image
+                style={{ flex:1, width: 230, height: 40, resizeMode: 'contain' }}
+                source={require('./assets/images/frydo-logo.png')}
+                resizeMode='contain'
+              />
+            ),
+            headerRight: () => (
+              <View style={{ backgroundColor:'#009d28', paddingLeft:5, borderTopLeftRadius:10, borderBottomLeftRadius:10}}>
+              <MaterialCommunityIcons style={{paddingRight:15}}  onPress={() => navigation.navigate('AuthenticatedNavigationRoutes')} name="home-outline" color="#fff" size={26} />
+              </View>
+             ),
+          })}
+        />    */}
 
     </Stack.Navigator>
     </NavigationContainer>

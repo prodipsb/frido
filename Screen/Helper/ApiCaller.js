@@ -6,8 +6,6 @@ import Config from 'react-native-config';
 
 const appEnv = Config.APP_ENV;
 
-console.log('appEnv', appEnv);
-
 let appUrl = '';
 if(appEnv == 'production'){
      appUrl = Config.APP_ENDPOINT;
@@ -17,10 +15,9 @@ if(appEnv == 'production'){
 
 
 
-export const get = (endpoint, params) => {
+export const get = async (endpoint, params) => {
     const url = `${appUrl}/${endpoint}`;
      console.log('app url', url);
-    // return false;
 
    // const { accessToken } = getToken();
     const headers = {}
@@ -30,18 +27,13 @@ export const get = (endpoint, params) => {
         method: 'GET',
         url: `${url}`,
         headers: {
-            'Accept': 'application/json',
             'content-type': 'application/json',
             ...headers
         },
-        params: params
+        params
     };
-   // nProgress.start();
-    return axios.request(options)?.then((response) => response)
-        .catch((error) => {
-            console.log(error);
-        })
-     //   .finally(() => nProgress.done());
+
+    return await axios(options)?.then((res) => res);
 }
 
 
@@ -101,6 +93,42 @@ export const upload = async (endpoint, body) => {
         .catch((error) => {
             console.log(error);
         })
+}
+
+
+export const postForm = async(endpoint, body) => {
+    const url = `${appUrl}/api/v1/${endpoint}`;
+    console.log('app url', url);
+    const headers = {}
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+            ...headers
+        },
+        url: url,
+        data: body
+    }
+
+    return  await axios(options)?.then((res) => res)
+        .catch(error => {
+            console.log('api postForm err22', error)
+     })
+
+
+
+    //    const formData = new URLSearchParams();
+    //     formData.append('field1', 'value1');
+    //     formData.append('field2', 'value2');
+    //     const response = await axios.request({
+    //     url: url,
+    //     method: 'POST',
+    //     headers: {'Content-Type': 'application/json'},
+    //     data: formData
+    //     });
+
 }
 
 

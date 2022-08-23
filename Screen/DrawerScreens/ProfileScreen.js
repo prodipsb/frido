@@ -24,6 +24,8 @@ const ProfileScreen = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
   const [auth, setAuth] = useState('');
+  const [avatar, setAvatar] = useState('');
+  const [profiderId, setProviderId] = useState('');
 
    useEffect(()  => {
     getAuth();
@@ -31,29 +33,45 @@ const ProfileScreen = ({navigation}) => {
   }, []);
 
   const getAuth = async () => {   
-
+    
     try {
-        const authId = await AsyncStorage.getItem('authId')
-       
-        if (authId !== null) {
+      
+      const auth = await AsyncStorage.getItem('auth');
+      const authJson = JSON.parse(auth);
+      // console.log('getAuth22', authJson);
+      setAuth(authJson);
+        //  const authId = await AsyncStorage.getItem('authId')
+        //  const providerId = await AsyncStorage.getItem('providerId')
+        //  setProviderId(providerId);
 
-          const params = {
-            id: authId,
-          };
+        //  const authAvatar = await AsyncStorage.getItem('avatar')
+        //  setAvatar(authAvatar);
+
+      //     const params = {
+      //       id: authId,
+      //       provider_id: providerId
+      //     };
+
+        
+
+      //     console.log('params', params);
      
 
-       const response =  await get(`getuser`, params).then((res) => {
+      //  await get('getuser', params).then((res) => {
 
-              setAuth(res?.data?.data);
+      //         console.log('signel user', res?.data);
 
-        }).catch(error => {
-          console.log('get auth user from apieeee error',error)
-        });
+      //         setAuth(res?.data?.data);
 
-        }
+      //   }).catch(error => {
+      //     console.log('get auth user from apieeee error',error)
+      //   });
+
+       
     } catch (e) {
       console.log('error1',e);
     }
+
   }
 
 
@@ -66,8 +84,9 @@ const ProfileScreen = ({navigation}) => {
     const logout = () => {
       console.log('logout');
       AsyncStorage.removeItem('token');
+      AsyncStorage.removeItem('auth');
       AsyncStorage.removeItem('authId');
-      AsyncStorage.removeItem('authName');
+      AsyncStorage.removeItem('authName');-
       AsyncStorage.removeItem('authEmail');
       AsyncStorage.removeItem('avatar');
       navigation.replace('LoginScreen');
@@ -78,20 +97,27 @@ const ProfileScreen = ({navigation}) => {
       navigation.navigate('EditProfile');
     }
 
+    // console.log('auuth.avatar auth', auth);
+    // console.log('auuth.avatar', auth?.avatar);
+    // console.log('auth?.avatar?.includes("https://")', auth?.avatar?.includes("https://"));
+    // console.log('`${endPoint}/${auth?.avatar}`', `${endPoint}/${auth?.avatar}`);
+    // console.log('auuth.avatar name', auth.photo);
+   
+
     return (
       <View style={styles.headerContainer}>
         <ScreenTitle title="Profile"/>
         <View style={styles.userRow}>
 
             <Avatar
-            size={100}
-            rounded 
-            icon={{name: 'user', type: 'font-awesome', color:'green', size: 130, backgroundColor:'white'}}
+              size={100}
+              rounded 
+              icon={{name: 'user', type: 'font-awesome', color:'green', size: 130, backgroundColor:'white'}}
               source={{
-                uri: 
-                   auth?.avatar?.uri ? auth?.avatar?.uri :  auth?.avatar ? `${endPoint}/${auth?.avatar}` : mUser
+                uri: auth?.avatar?.includes("https://") ? auth?.avatar : `${endPoint}/${auth?.avatar}`,
+                cache: 'reload'
               }}
-              containerStyle={{ backgroundColor: 'white' }}
+              containerStyle={{ borderColor: 'green', borderWidth: 1, margin: 10 }}
               showEditButton = {true}
               onPress={() => console.log("Works!")}
               >
@@ -232,7 +258,7 @@ const styles = StyleSheet.create({
     width: 120,
   },
   userNameRow: {
-    marginTop:20,
+    marginTop:10,
     marginBottom: 10,
   },
   userNameText: {
@@ -245,6 +271,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'column',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 2,
   },
 })

@@ -14,11 +14,12 @@ export default ScreenTitle;
 const styles = StyleSheet.create({
   screenLevel: {
     marginTop: 10,
-    marginBottom: 25,
+    marginBottom: 10,
     alignItems: 'center',
   },
   textStyle: {
     flexDirection: 'row',
+    fontSize: 17,
     color:'green', 
     fontWeight:'bold'
   }

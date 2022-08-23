@@ -61,37 +61,38 @@ const LoginScreen = ({navigation}) => {
     }
     console.log("Frydo signin payload", payload)
 
-    // await post('api/v1/user/signin', payload)
-    //         .then((response)=> {
-    //           console.log('response return though axios post method1', response);
+    await post('api/v1/user/signin', payload)
+            .then((response)=> {
+              console.log('response return though axios post method1', response?.data?.user);
 
-    //           //Hide Loader
-    //           setLoading(false);
+              //Hide Loader
+              setLoading(false);
 
-    //           if (response?.error) {
+              if (response) {
 
-    //             setErrortext(response?.error);
-    //             console.log(response?.error);
+                AsyncStorage.setItem('token', response?.data?.token);
+                AsyncStorage.setItem('auth', JSON.stringify(response?.data?.user));
+                navigation.replace('AuthenticatedNavigationRoutes');
+
               
+              } else {
+              
+                setErrortext(response?.error);
+                console.log(response?.error);
                
-    //           } else {
-              
-    //             AsyncStorage.setItem('auth', JSON.stringify(response?.data));
-    //             navigation.replace('AuthenticatedNavigationRoutes');
 
-    //           }
+              }
               
-    // })
-    // .catch((err) => {
-    //   console.log('axios return errr', response);
-    //   //Hide Loader
-    //   setLoading(false);
-    //   console.error(err);
-    // });
+    })
+    .catch((err) => {
+      console.log('axios return errr', response);
+      //Hide Loader
+      setLoading(false);
+      console.error(err);
+    });
 
-  //return false;
  
-    const endPoint = Config.APP_ENDPOINT_LOCAL;
+ /*   const endPoint = Config.APP_ENDPOINT_LOCAL;
     fetch(`${endPoint}/api/v1/user/signin`, {
       method: 'POST',
       body:JSON.stringify(dataToSend),
@@ -132,6 +133,7 @@ const LoginScreen = ({navigation}) => {
         console.error(error);
       });
 
+      */
       
   };
 
@@ -139,6 +141,8 @@ const LoginScreen = ({navigation}) => {
   const googleSignIn = async () => {
     console.log('enter signIn');
     try {
+      setLoading(true);
+
       GoogleSignin.configure(
         {
           //webClientId is required if you need offline access
@@ -154,12 +158,22 @@ const LoginScreen = ({navigation}) => {
       
      if(userInfo){
 
+      const params ={
+        email: userInfo.user.email,
+      }
+
+      const response = await get('getuser', params)
+            .catch(err =>{console.log('err', err)});
+
+      AsyncStorage.setItem('auth', JSON.stringify(response?.data?.data));
+      setLoading(false);
       navigation.replace('AuthenticatedNavigationRoutes');
 
     }
 
 
     } catch (error) {
+      setLoading(false);
       console.log('error', error);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow

@@ -75,8 +75,16 @@ const HomeOptions = [
 
 const showAlert = (item, routeNav) => {
 
+  console.log('routeNav', routeNav);
   if(item.text == 'Profile'){
     routeNav.navigation.replace('ProfileScreen')
+  }else if(item.text == 'Closet'){
+    routeNav.navigation.replace('ClosetScreen')
+  }else if(item.text == 'Style Stats'){
+    routeNav.navigation.replace('StyleStatScreen')
+  }else if(item.text == 'Inspiration'){
+    console.log('Inspirationoooo');
+    routeNav.navigation.replace('InspirationScreen')
   }else{
 
   Alert.alert(
@@ -109,17 +117,8 @@ const GridView = ({item, routeNav}) => (
  
 const HomeScreen = (navigation) => {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor:'#fff'}}>
+    <SafeAreaView style={{flex: 1, justifyContent:'center', alignItems:'center', backgroundColor:'#fff'}}>
         <ScreenTitle title="Home"/>
-
-        {/* <FlatList
-          contentContainerStyle={styles.listView}
-          data={HomeOptions}
-          renderItem={({ item }) => <GridView key={item.id} item={item} />}
-          keyExtractor={item => item.id}
-          numColumns={3}
-          key={item => item.id}
-        /> */}
 
         <FlatList
           contentContainerStyle={styles.listView}
@@ -153,9 +152,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   listView: {
+   // margin: 20,
     justifyContent: 'center',
   //  backgroundColor: 'white',
-    alignItems: 'center',
+   // alignItems: 'center',
   
   },
 

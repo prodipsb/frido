@@ -34,12 +34,18 @@ const EditProfile = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
   const [token, setToken] = useState('');
-  const [auth, setAuth] = useState({
-    name: '',
-    email: '',
-    avatar: '',
-    about: '',
-  });
+  const [avatar, setAvatar] = useState('');
+  const [profiderId, setProviderId] = useState('');
+  const [auth, setAuth] = useState('');
+
+  // const [auth, setAuth] = useState({
+  //   id: '',
+  //   name: '',
+  //   providerId: '',
+  //   email: '',
+  //   avatar: '',
+  //   about: '',
+  // });
 
  
    useEffect(()  => {
@@ -48,46 +54,25 @@ const EditProfile = ({navigation}) => {
 
   const getAuth = async () => {   
 
-    try {
-        const authId = await AsyncStorage.getItem('authId')
+      const authUser = await AsyncStorage.getItem('auth');
+      console.log('getAuth', authUser);
+      const authJson = JSON.parse(authUser);
+      setAuth(authJson);
+      
+      const params = {
+        email: authJson?.email,
+      };
+
+      
+       await get(`getuser`, params).then((res) => {
+        console.log('signel user pp', res.data.data);
+        setAuth(res?.data?.data);
+
+      }).catch(error => {
+        console.log('get auth user from apieeee error',error)
+      });
        
-        if (authId !== null) {
-
-          const params = {
-            id: authId,
-          };
-     
-
-       const response =  await get(`getuser`, params).then((res) => {
-
-              setAuth(res?.data?.data);
-
-        }).catch(error => {
-          console.log('get auth user from apieeee error',error)
-        });
-
-          
-        //  await fetch(`${endPoint}/getuser?id=${authId}`, {
-        //     method: 'GET',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //     //  'Authorization': `Token ${authParse.token}`
-        //     },
-        //   //  params: params,
-        //  }).then(response => response.json())
-        //  .then(responseJson => {
-        //     console.log('get auth user from apieeee',responseJson);
-        //     setAuth(responseJson?.data);
-        //  }).catch(error => {
-        //     console.log('get auth user from apieeee error',error);
-        //  });
-
-       
-        }
-    } catch (e) {
-      // error reading value
-      console.log('error1',e);
-    }
+    
   }
 
 // console.log('auth1',auth);
@@ -100,6 +85,8 @@ const EditProfile = ({navigation}) => {
       return;
     }
 
+    setLoading(true);
+
     const data={
       id: auth?._id,
       name: auth?.name,
@@ -111,7 +98,11 @@ const EditProfile = ({navigation}) => {
 
     const response =  await post('updateuser', data).then((res) => {
 
-          console.log('res dipp',res);
+          console.log('res dipp',res?.data?.data);
+          AsyncStorage.setItem('auth', JSON.stringify(res?.data?.data));
+
+          setLoading(false);
+
           navigation.replace('ProfileScreen');
               
         }).catch(err => console.log(err))
@@ -155,6 +146,7 @@ const EditProfile = ({navigation}) => {
       
           const getUploaded = await upload('upload', formdata);
           console.log('getUploaded', getUploaded);
+          console.log('getUploaded', getUploaded);
       
           //  fetch(`${endPoint}/` + "upload",{
           //     method: 'post',
@@ -177,9 +169,12 @@ const EditProfile = ({navigation}) => {
 
     }
 
-   // console.log('auth object change',auth);
+    console.log('auth object change',auth);
+    console.log('auth object change photo',auth?.avatar);
     // auth = JSON.parse(auth);
     // console.log('auth object change uri', auth.uri);
+
+    //console.log('is https', auth?.avatar?.startsWith("https"))
 
     return (
       <View>
@@ -203,14 +198,14 @@ const EditProfile = ({navigation}) => {
           <KeyboardAvoidingView enabled>
             <View style={{alignItems: 'center', marginBottom:20}}>
             <Avatar
-            size={120}
-            rounded 
-            icon={{name: 'user', type: 'font-awesome', color:'green', size: 130, backgroundColor:'white'}}
+              size={120}
+              rounded 
+              icon={{name: 'user', type: 'font-awesome', color:'green', size: 130, backgroundColor:'white'}}
               source={{
-                uri: 
-                   auth?.avatar?.uri ? auth?.avatar?.uri :  auth?.avatar ? `${endPoint}/${auth?.avatar}` : '../../assets/images/user.png',
+                uri: auth?.avatar?.uri ? auth?.avatar?.uri : auth?.avatar?.includes("https://")? auth?.avatar : `${endPoint}/${auth?.avatar}`,
+                cache: 'reload'
               }}
-              containerStyle={{ backgroundColor: 'white' }}
+              containerStyle={{ borderColor: 'green', borderWidth: 1, margin: 10 }}
               showEditButton = {true}
               onPress={() => console.log("Works!")}
               
@@ -241,6 +236,8 @@ const EditProfile = ({navigation}) => {
             </View>
             <View style={styles.SectionStyle}>
               <TextInput
+                editable={false} 
+                selectTextOnFocus={false}
                 style={styles.inputStyle}
                 onChangeText={(UserEmail) =>
                  // setUserEmail(UserEmail)
